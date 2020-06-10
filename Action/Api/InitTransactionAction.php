@@ -10,6 +10,8 @@ use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\LogicException;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Reply\HttpRedirect;
+use Payum\Core\Reply\HttpResponse;
+use Payum\Core\Request\RenderTemplate;
 
 class InitTransactionAction extends BaseApiAwareAction
 {
@@ -44,9 +46,24 @@ class InitTransactionAction extends BaseApiAwareAction
                 return;
             }
         }
-        if ($model['RedirectRequired']) {
-            throw new HttpRedirect($model['Redirect']['RedirectUrl']);
+
+        if (!$model['RedirectRequired']) {
+            return;
         }
+
+        // render template, if required
+        //if($this->api->hasTemplate()) {}
+
+        if (true) {
+            $this->gateway->execute($renderTemplate = new RenderTemplate('@PayumSaferPay/Action/obtain_checkout_token.html.twig', [
+                'model'     => $model,
+                'frame_src' => $model['Redirect']['RedirectUrl'],
+            ]));
+
+            throw new HttpResponse($renderTemplate->getResult());
+        }
+
+        throw new HttpRedirect($model['Redirect']['RedirectUrl']);
     }
 
     public function supports($request): bool

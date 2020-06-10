@@ -76,6 +76,10 @@ class SaferpayGatewayFactory extends GatewayFactory
 
                 return new Api((array) $config, $config['payum.http_client'], $config['httplug.message_factory']);
             };
+
+            $config['payum.paths'] = array_replace([
+                'PayumSaferPay' => __DIR__ . '/Resources/views',
+            ], $config['payum.paths'] ?: []);
         }
     }
 }
